@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SCMS - Add Visitor</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    display:flex;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    background:rgba(255,255,255,0.04);
+    border-right:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    padding:25px 18px;
+    position:fixed;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:34px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.nav-links{
+    list-style:none;
+}
+
+.nav-links li{
+    margin-bottom:12px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 16px;
+    border-radius:16px;
+    transition:0.3s;
+}
+
+.nav-links a i{
+    font-size:22px;
+}
+
+.nav-links a:hover,
+.nav-links a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    transform:translateX(5px);
+}
+
+.profile-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:20px;
+}
+
+.profile-box img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    border:2px solid #6366f1;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    padding:12px 15px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box i{
+    color:#818cf8;
+    font-size:18px;
+}
+
+.search-box input{
+    width:100%;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+    margin-left:10px;
+}
+
+.top-right{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.top-right i{
+    font-size:24px;
+    color:#cbd5e1;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.top-right i:hover{
+    color:#818cf8;
+}
+
+#clock{
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+/* PAGE TITLE */
+
+.page-title{
+    margin-bottom:30px;
+}
+
+.page-title h1{
+    font-size:35px;
+    margin-bottom:8px;
+}
+
+.page-title p{
+    color:#94a3b8;
+}
+
+/* CARD */
+
+.card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:28px;
+    padding:35px;
+    backdrop-filter:blur(15px);
+}
+
+/* FORM */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.input-group{
+    margin-bottom:20px;
+}
+
+.input-group label{
+    display:block;
+    margin-bottom:10px;
+    color:#cbd5e1;
+    font-weight:500;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea{
+    width:100%;
+    padding:15px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:#0f172a;
+    color:white;
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:15px;
+}
+
+textarea{
+    height:120px;
+    resize:none;
+}
+
+/* BUTTON */
+
+.btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+    margin-top:10px;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 25px rgba(99,102,241,0.4);
+}
+
+/* QR BOX */
+
+.qr-box{
+    margin-top:35px;
+    text-align:center;
+}
+
+.qr-box img{
+    width:200px;
+    background:white;
+    padding:10px;
+    border-radius:20px;
+}
+
+.qr-box p{
+    margin-top:15px;
+    color:#94a3b8;
+}
+
+/* INFO CARDS */
+
+.info-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-top:35px;
+}
+
+.info-card{
+    background:#111827;
+    padding:25px;
+    border-radius:20px;
+    transition:0.3s;
+}
+
+.info-card:hover{
+    transform:translateY(-5px);
+}
+
+.info-card i{
+    font-size:35px;
+    color:#818cf8;
+    margin-bottom:15px;
+}
+
+.info-card h2{
+    font-size:28px;
+    margin-bottom:5px;
+}
+
+.info-card p{
+    color:#94a3b8;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:992px){
+
+    .sidebar{
+        width:90px;
+        padding:20px 10px;
+    }
+
+    .logo span,
+    .nav-links span,
+    .profile-box div{
+        display:none;
+    }
+
+    .nav-links a{
+        justify-content:center;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+
+}
+
+@media(max-width:700px){
+
+    .main{
+        padding:20px;
+    }
+
+    .search-box{
+        width:100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div>
+
+        <div class="logo">
+
+            <i class='bx bx-shield-quarter'></i>
+
+            <span>SCMS Guard</span>
+
+        </div>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="guard.html">
+                    <i class='bx bx-grid-alt'></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="add-visitors.html" class="active">
+                    <i class='bx bx-user-plus'></i>
+                    <span>Add Visitor</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="visitor-records.html">
+                    <i class='bx bx-list-ul'></i>
+                    <span>Visitor Records</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="qr-verification.html">
+                    <i class='bx bx-qr-scan'></i>
+                    <span>QR Verification</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="parking-monitor.html">
+                    <i class='bx bx-car'></i>
+                    <span>Parking Monitor</span>
+                </a>
+            </li>
+
+            <li style="margin-top:20px;">
+                <a href="index.html" style="color:#ef4444;">
+                    <i class='bx bx-log-out'></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="profile-box">
+
+        <img src="https://i.pravatar.cc/150?img=15">
+
+        <div>
+            <h4>Security Guard</h4>
+            <small>Authorized Panel</small>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search visitor...">
+
+        </div>
+
+        <div class="top-right">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-shield'></i>
+
+        </div>
+
+    </div>
+
+    <!-- PAGE TITLE -->
+
+    <div class="page-title">
+
+        <h1>Add New Visitor</h1>
+
+        <p>
+            Register visitors and generate secure QR visitor passes
+        </p>
+
+    </div>
+
+    <!-- FORM CARD -->
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div class="input-group">
+
+                <label>Visitor Name</label>
+
+                <input type="text" placeholder="Enter visitor name">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>CNIC Number</label>
+
+                <input type="text" placeholder="35202-XXXXXXX-X">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>House Number</label>
+
+                <input type="text" placeholder="A-102">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Purpose</label>
+
+                <select>
+
+                    <option>Guest</option>
+                    <option>Delivery</option>
+                    <option>Maintenance</option>
+                    <option>Emergency</option>
+
+                </select>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Vehicle Number</label>
+
+                <input type="text" placeholder="LEA-1234">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Visit Time</label>
+
+                <input type="time">
+
+            </div>
+
+        </div>
+
+        <div class="input-group">
+
+            <label>Additional Notes</label>
+
+            <textarea placeholder="Write visitor details or instructions..."></textarea>
+
+        </div>
+
+        <button class="btn">
+
+            <i class='bx bx-qr'></i>
+
+            Generate Visitor Pass
+
+        </button>
+
+        <!-- QR -->
+
+        <div class="qr-box">
+
+            <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VisitorPass">
+
+            <p>
+                Secure Visitor QR Access Pass
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- INFO CARDS -->
+
+    <div class="info-cards">
+
+        <div class="info-card">
+
+            <i class='bx bx-group'></i>
+
+            <h2>45</h2>
+
+            <p>Total Visitors Today</p>
+
+        </div>
+
+        <div class="info-card">
+
+            <i class='bx bx-check-circle'></i>
+
+            <h2>39</h2>
+
+            <p>Approved Entries</p>
+
+        </div>
+
+        <div class="info-card">
+
+            <i class='bx bx-time-five'></i>
+
+            <h2>06</h2>
+
+            <p>Pending Approvals</p>
+
+        </div>
+
+        <div class="info-card">
+
+            <i class='bx bx-car'></i>
+
+            <h2>18</h2>
+
+            <p>Vehicles Entered</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+</html>

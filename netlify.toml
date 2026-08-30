@@ -1,0 +1,20 @@
+# Netlify deploy config — publishes the static frontend.
+# The app ships with an in-browser mock API (frontend/js/mock-api.js),
+# so the live site is fully interactive with no backend.
+
+[build]
+  publish = "frontend"
+  command = ""
+
+# Pretty URL for the landing page
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

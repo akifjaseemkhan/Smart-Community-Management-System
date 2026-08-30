@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SCMS - Visitor Management</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+    display:flex;
+    overflow-x:hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    background:rgba(255,255,255,0.04);
+    backdrop-filter:blur(18px);
+    border-right:1px solid rgba(255,255,255,0.08);
+    padding:25px 18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:35px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.menu{
+    list-style:none;
+}
+
+.menu li{
+    margin-bottom:12px;
+}
+
+.menu li a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    padding:14px;
+    border-radius:16px;
+    transition:0.3s;
+}
+
+.menu li a i{
+    font-size:22px;
+    margin-right:12px;
+}
+
+.menu li a:hover,
+.menu li a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    transform:translateX(5px);
+}
+
+/* PROFILE */
+
+.profile-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:20px;
+}
+
+.profile-box img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    border:2px solid #6366f1;
+}
+
+.profile-box small{
+    color:#94a3b8;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:rgba(255,255,255,0.05);
+    padding:12px 15px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box input{
+    width:100%;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+    margin-left:10px;
+}
+
+.top-icons{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.top-icons i{
+    font-size:24px;
+    cursor:pointer;
+}
+
+/* HEADER */
+
+.page-header{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    padding:35px;
+    border-radius:28px;
+    margin-bottom:35px;
+}
+
+.page-header h1{
+    font-size:35px;
+    margin-bottom:10px;
+}
+
+.page-header p{
+    color:#e0e7ff;
+}
+
+/* CARDS */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+    margin-bottom:35px;
+}
+
+.card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    padding:28px;
+    border-radius:24px;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 0 25px rgba(99,102,241,0.3);
+}
+
+.card i{
+    font-size:40px;
+    color:#818cf8;
+    margin-bottom:15px;
+}
+
+.card h2{
+    font-size:30px;
+}
+
+.card p{
+    color:#94a3b8;
+    margin-top:5px;
+}
+
+/* CONTENT BOX */
+
+.content-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:30px;
+    border-radius:28px;
+    margin-bottom:30px;
+}
+
+/* FORM */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:10px;
+    font-weight:500;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:#111827;
+    color:white;
+}
+
+/* BUTTON */
+
+.btn{
+    padding:14px 24px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+
+/* TABLE */
+
+.table-container{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:16px;
+    text-align:left;
+}
+
+th{
+    color:#94a3b8;
+    text-transform:uppercase;
+    font-size:13px;
+}
+
+tr{
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.status{
+    padding:8px 14px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.approved{
+    background:#10b98133;
+    color:#10b981;
+}
+
+.completed{
+    background:#3b82f633;
+    color:#3b82f6;
+}
+
+.pending{
+    background:#f59e0b33;
+    color:#f59e0b;
+}
+
+/* QR BOX */
+
+.qr-box{
+    background:#111827;
+    padding:25px;
+    border-radius:22px;
+    text-align:center;
+    margin-top:25px;
+}
+
+.qr-box img{
+    width:160px;
+    margin-top:15px;
+    border-radius:12px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:992px){
+
+    .sidebar{
+        width:90px;
+    }
+
+    .logo span,
+    .menu li a span,
+    .profile-box div{
+        display:none;
+    }
+
+    .menu li a{
+        justify-content:center;
+    }
+
+    .menu li a i{
+        margin:0;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div>
+
+        <div class="logo">
+
+            <i class='bx bx-building-house'></i>
+
+            <span>SCMS</span>
+
+        </div>
+
+        <ul class="menu">
+
+            <li>
+                <a href="resident.html">
+                    <i class='bx bx-grid-alt'></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="bills.html">
+                    <i class='bx bx-wallet'></i>
+                    <span>Bills</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="complaint-page.html">
+                    <i class='bx bx-message-square-detail'></i>
+                    <span>Complaints</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="parking-page.html">
+                    <i class='bx bx-car'></i>
+                    <span>Parking</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="visitors-page.html" class="active">
+                    <i class='bx bx-group'></i>
+                    <span>Visitors</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="profile.html">
+                    <i class='bx bx-user'></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html" style="color:#ef4444;">
+                    <i class='bx bx-log-out'></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="profile-box">
+
+        <img src="https://i.pravatar.cc/100">
+
+        <div>
+            <h4>Resident</h4>
+            <small>Community Member</small>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search visitors...">
+
+        </div>
+
+        <div class="top-icons">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-message-rounded'></i>
+
+        </div>
+
+    </div>
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Smart Visitor Management
+        </h1>
+
+        <p>
+            Manage visitor entries, approvals and security verification
+        </p>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <i class='bx bx-group'></i>
+
+            <h2>15</h2>
+
+            <p>Total Visitors</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-check-circle'></i>
+
+            <h2>10</h2>
+
+            <p>Approved Visitors</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-time'></i>
+
+            <h2>3</h2>
+
+            <p>Pending Requests</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-shield'></i>
+
+            <h2>24/7</h2>
+
+            <p>Security Monitoring</p>
+
+        </div>
+
+    </div>
+
+    <!-- ADD VISITOR -->
+
+    <div class="content-box">
+
+        <h2 style="margin-bottom:25px;">
+            Add New Visitor
+        </h2>
+
+        <div class="form-group">
+
+            <label>
+                Visitor Name
+            </label>
+
+            <input type="text" placeholder="Enter visitor name">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                CNIC Number
+            </label>
+
+            <input type="text" placeholder="Enter CNIC number">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Visit Purpose
+            </label>
+
+            <input type="text" placeholder="Enter visit purpose">
+
+        </div>
+
+        <button class="btn">
+
+            <i class='bx bx-qr'></i>
+
+            Generate Entry Pass
+
+        </button>
+
+        <!-- QR -->
+
+        <div class="qr-box">
+
+            <h3>
+                Visitor QR Pass
+            </h3>
+
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=VisitorPass">
+
+            <p style="margin-top:15px;color:#94a3b8;">
+                Show this QR at security gate
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- VISITOR HISTORY -->
+
+    <div class="content-box">
+
+        <h2 style="margin-bottom:25px;">
+            Visitor History
+        </h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Ali</td>
+                        <td>Today</td>
+                        <td>Family Visit</td>
+
+                        <td>
+                            <span class="status approved">
+                                Approved
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Ahmed</td>
+                        <td>Yesterday</td>
+                        <td>Maintenance Work</td>
+
+                        <td>
+                            <span class="status completed">
+                                Completed
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Usman</td>
+                        <td>2 Days Ago</td>
+                        <td>Delivery</td>
+
+                        <td>
+                            <span class="status pending">
+                                Pending
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+
+</html>

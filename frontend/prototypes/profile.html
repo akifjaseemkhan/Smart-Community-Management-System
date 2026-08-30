@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SCMS - Resident Profile</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+    display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    background:rgba(255,255,255,0.04);
+    backdrop-filter:blur(18px);
+    border-right:1px solid rgba(255,255,255,0.08);
+    padding:25px 18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:35px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.menu{
+    list-style:none;
+}
+
+.menu li{
+    margin-bottom:12px;
+}
+
+.menu li a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    padding:14px;
+    border-radius:16px;
+    transition:0.3s;
+}
+
+.menu li a i{
+    font-size:22px;
+    margin-right:12px;
+}
+
+.menu li a:hover,
+.menu li a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    transform:translateX(5px);
+}
+
+/* PROFILE BOX */
+
+.profile-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:20px;
+}
+
+.profile-box img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    border:2px solid #6366f1;
+}
+
+.profile-box small{
+    color:#94a3b8;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:rgba(255,255,255,0.05);
+    padding:12px 15px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box input{
+    width:100%;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+    margin-left:10px;
+}
+
+.top-icons{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.top-icons i{
+    font-size:24px;
+    cursor:pointer;
+}
+
+/* HEADER */
+
+.page-header{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    padding:35px;
+    border-radius:28px;
+    margin-bottom:35px;
+}
+
+.page-header h1{
+    font-size:35px;
+    margin-bottom:10px;
+}
+
+.page-header p{
+    color:#e0e7ff;
+}
+
+/* PROFILE GRID */
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:350px 1fr;
+    gap:30px;
+}
+
+/* CARDS */
+
+.card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    padding:30px;
+    border-radius:28px;
+}
+
+/* PROFILE CARD */
+
+.profile-card{
+    text-align:center;
+}
+
+.profile-card img{
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    border:5px solid #6366f1;
+    margin-bottom:20px;
+}
+
+.profile-card h2{
+    margin-bottom:8px;
+}
+
+.profile-card p{
+    color:#94a3b8;
+    margin-bottom:10px;
+}
+
+.badge{
+    display:inline-block;
+    padding:8px 16px;
+    border-radius:30px;
+    background:#10b98122;
+    color:#10b981;
+    font-size:13px;
+    font-weight:600;
+    margin-top:10px;
+}
+
+/* INFO */
+
+.info-box{
+    background:#111827;
+    padding:18px;
+    border-radius:18px;
+    margin-top:18px;
+    text-align:left;
+}
+
+.info-box h4{
+    margin-bottom:8px;
+    color:#818cf8;
+}
+
+.info-box p{
+    color:#cbd5e1;
+}
+
+/* FORM */
+
+.form-group{
+    margin-bottom:22px;
+}
+
+label{
+    display:block;
+    margin-bottom:10px;
+    font-weight:500;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:#111827;
+    color:white;
+    font-size:15px;
+}
+
+/* BUTTONS */
+
+.btn{
+    padding:14px 24px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+
+.btn-danger{
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.button-group{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+/* ACTIVITY */
+
+.activity{
+    margin-top:30px;
+}
+
+.activity-item{
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+    background:#111827;
+    padding:18px;
+    border-radius:18px;
+}
+
+.activity-item i{
+    font-size:28px;
+    color:#818cf8;
+}
+
+.activity-item p{
+    color:#94a3b8;
+    margin-top:4px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:992px){
+
+    .sidebar{
+        width:90px;
+    }
+
+    .logo span,
+    .menu li a span,
+    .profile-box div{
+        display:none;
+    }
+
+    .menu li a{
+        justify-content:center;
+    }
+
+    .menu li a i{
+        margin:0;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+
+    .profile-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div>
+
+        <div class="logo">
+
+            <i class='bx bx-building-house'></i>
+
+            <span>SCMS</span>
+
+        </div>
+
+        <ul class="menu">
+
+            <li>
+                <a href="resident.html">
+                    <i class='bx bx-grid-alt'></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="bills.html">
+                    <i class='bx bx-wallet'></i>
+                    <span>Bills</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="complaint-page.html">
+                    <i class='bx bx-message-square-detail'></i>
+                    <span>Complaints</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="parking-page.html">
+                    <i class='bx bx-car'></i>
+                    <span>Parking</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="visitors-page.html">
+                    <i class='bx bx-group'></i>
+                    <span>Visitors</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="profile.html" class="active">
+                    <i class='bx bx-user'></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="index.html" style="color:#ef4444;">
+                    <i class='bx bx-log-out'></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="profile-box">
+
+        <img src="https://i.pravatar.cc/100">
+
+        <div>
+            <h4>Resident</h4>
+            <small>Community Member</small>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search profile settings...">
+
+        </div>
+
+        <div class="top-icons">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-message-rounded'></i>
+
+        </div>
+
+    </div>
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Resident Profile
+        </h1>
+
+        <p>
+            Manage your account information and community profile settings
+        </p>
+
+    </div>
+
+    <!-- PROFILE GRID -->
+
+    <div class="profile-grid">
+
+        <!-- LEFT -->
+
+        <div class="card profile-card">
+
+            <img src="https://i.pravatar.cc/150">
+
+            <h2>
+                Resident User
+            </h2>
+
+            <p>
+                Smart Community Member
+            </p>
+
+            <div class="badge">
+                🟢 Active Resident
+            </div>
+
+            <div class="info-box">
+
+                <h4>
+                    House Number
+                </h4>
+
+                <p>
+                    A-12
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h4>
+                    Email Address
+                </h4>
+
+                <p>
+                    resident@gmail.com
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h4>
+                    Phone Number
+                </h4>
+
+                <p>
+                    03001234567
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h4>
+                    Parking Slot
+                </h4>
+
+                <p>
+                    P-12
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div>
+
+            <!-- UPDATE PROFILE -->
+
+            <div class="card">
+
+                <h2 style="margin-bottom:25px;">
+                    Update Profile
+                </h2>
+
+                <div class="form-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input type="text" placeholder="Enter new name">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Email Address
+                    </label>
+
+                    <input type="email" placeholder="Enter new email">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Phone Number
+                    </label>
+
+                    <input type="text" placeholder="Enter new phone number">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        House Number
+                    </label>
+
+                    <input type="text" placeholder="Enter house number">
+
+                </div>
+
+                <div class="button-group">
+
+                    <button class="btn">
+
+                        <i class='bx bx-save'></i>
+
+                        Update Profile
+
+                    </button>
+
+                    <button class="btn btn-danger">
+
+                        <i class='bx bx-lock-alt'></i>
+
+                        Change Password
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIVITY -->
+
+            <div class="card activity">
+
+                <h2 style="margin-bottom:25px;">
+                    Recent Activity
+                </h2>
+
+                <div class="activity-item">
+
+                    <i class='bx bx-wallet'></i>
+
+                    <div>
+
+                        <h4>
+                            Maintenance Bill Paid
+                        </h4>
+
+                        <p>
+                            Today • Rs. 5000 payment completed successfully
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="activity-item">
+
+                    <i class='bx bx-car'></i>
+
+                    <div>
+
+                        <h4>
+                            Vehicle Registered
+                        </h4>
+
+                        <p>
+                            Yesterday • Honda Civic added to parking records
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="activity-item">
+
+                    <i class='bx bx-message-square-detail'></i>
+
+                    <div>
+
+                        <h4>
+                            Complaint Submitted
+                        </h4>
+
+                        <p>
+                            2 Days Ago • Water leakage complaint submitted
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+
+</html>

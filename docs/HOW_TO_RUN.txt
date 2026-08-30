@@ -1,0 +1,185 @@
+===============================================================
+  SMART COMMUNITY MANAGEMENT SYSTEM (SCMS)
+  COMPLETE SETUP & RUN GUIDE
+===============================================================
+
+WHAT YOU NEED TO DOWNLOAD
+--------------------------
+1. XAMPP  → https://www.apachefriends.org/download.html
+   (Gives you MySQL + phpMyAdmin in one click)
+
+2. Apache Tomcat 10 → https://tomcat.apache.org/download-10.cgi
+   Download: "64-bit Windows zip" under Core
+
+3. Java JDK 17+ → https://adoptium.net/
+   (Choose "Temurin 17 LTS" or newer for Windows x64)
+
+   NOTE: You only need this to run the REAL Java backend. The frontend in
+   /frontend works on its own via an in-browser mock API (js/mock-api.js) —
+   just open frontend/index.html or host that folder on Netlify.
+
+4. Apache Maven → https://maven.apache.org/download.cgi
+   Download the Binary zip archive
+
+===============================================================
+STEP 1 — Install Java JDK
+===============================================================
+1. Run the JDK installer
+2. After install, open Command Prompt and type:
+      java -version
+   You should see something like: openjdk version "17.x.x" (or newer)
+   Make sure JAVA_HOME points at this JDK (not an old JRE) before building.
+
+===============================================================
+STEP 2 — Install Maven
+===============================================================
+1. Extract Maven zip to C:\maven
+2. Add to System Environment Variables:
+   - MAVEN_HOME = C:\maven
+   - Add to PATH: C:\maven\bin
+3. Open new Command Prompt and type:
+      mvn -version
+   You should see Apache Maven x.x.x
+
+===============================================================
+STEP 3 — Setup Database with XAMPP
+===============================================================
+1. Install XAMPP
+2. Open XAMPP Control Panel
+3. Click START next to "MySQL"
+4. Open your browser and go to:
+      http://localhost/phpmyadmin
+5. Click "SQL" tab at the top
+6. Open the file: database/scms_database.sql
+   Copy ALL its content and paste into the SQL box
+7. Click "Go" to run
+8. You will see a new database "scms_db" appear on the left
+   with 5 tables: users, visitors, complaints, bills, parking
+9. Repeat steps 5-7 with database/scms_updates.sql
+   (adds the 6th table: announcements)
+
+===============================================================
+STEP 4 — Build the Java Backend
+===============================================================
+1. Open Command Prompt
+2. Navigate to the backend folder:
+      cd path\to\SCMS\backend
+   Example:
+      cd C:\Users\YourName\Desktop\SCMS\backend
+3. Run Maven build:
+      mvn clean package
+4. Wait for "BUILD SUCCESS"
+5. You will find a file: backend\target\scms.war
+
+===============================================================
+STEP 5 — Deploy to Tomcat
+===============================================================
+1. Extract Tomcat zip to C:\tomcat
+2. Copy the scms.war file:
+   FROM: backend\target\scms.war
+   TO:   C:\tomcat\webapps\scms.war
+3. Start Tomcat:
+   Open Command Prompt:
+      cd C:\tomcat\bin
+      startup.bat
+4. Wait 10-15 seconds for Tomcat to start
+5. Test the backend is working by visiting:
+      http://localhost:8080/scms/api/dashboard
+   You should see JSON data like: {"success":true,"totalResidents":3...}
+
+===============================================================
+STEP 6 — Open the Frontend
+===============================================================
+1. Open frontend/js/config.js and set:  useMock: false
+   (so the pages call your Tomcat backend instead of the mock)
+2. Serve the "frontend" folder with any static server, e.g.:
+      cd frontend
+      python -m http.server 4173
+   then open http://localhost:4173
+   (Opening index.html as a file:// also works for the mock demo,
+    but a static server is cleaner and avoids browser file:// limits.)
+
+===============================================================
+LOGIN CREDENTIALS (from sample data)
+===============================================================
+
+   ADMIN:
+   Email:    admin@scms.com
+   Password: admin123
+   Role:     System Administrator
+
+   RESIDENT:
+   Email:    ali@scms.com
+   Password: resident123
+   Role:     Community Resident
+
+   GUARD:
+   Email:    guard@scms.com
+   Password: guard123
+   Role:     Security Personnel
+
+===============================================================
+PROJECT FOLDER STRUCTURE
+===============================================================
+See README.md ("Project structure") for the full tree. In short:
+
+  frontend/   static site  (frontend/js/mock-api.js = no-backend demo)
+  backend/    Java Maven project  -> backend/target/scms.war
+  database/   scms_database.sql + scms_updates.sql
+  docs/       this file
+
+===============================================================
+DESIGN PATTERNS USED (Java)
+===============================================================
+The original design pattern classes are kept and demonstrate:
+- Singleton   → AdminSession (one admin session)
+- Factory     → VehicleFactory (creates Car/Bike objects)
+- Builder     → ResidentBuilder (builds Resident objects)
+- Adapter     → ComplaintAdapter (adapts old complaint format)
+- Bridge      → Payment methods (Card/Cash)
+- Composite   → LoginForm (composed of form fields)
+
+===============================================================
+API ENDPOINTS REFERENCE
+===============================================================
+POST /api/login          ← Login
+GET  /api/dashboard      ← Dashboard stats
+GET  /api/visitors       ← All visitors
+POST /api/visitors       ← Add visitor
+PUT  /api/visitors       ← Update visitor status
+DEL  /api/visitors?id=X  ← Delete visitor
+GET  /api/complaints     ← All complaints
+POST /api/complaints     ← Submit complaint
+PUT  /api/complaints     ← Update complaint status
+GET  /api/bills          ← All bills (or ?resident_id=X)
+POST /api/bills          ← Add bill
+PUT  /api/bills          ← Mark bill paid
+GET  /api/parking        ← All parking slots
+PUT  /api/parking        ← Update slot status
+
+===============================================================
+TROUBLESHOOTING
+===============================================================
+
+Problem: "Cannot connect to server" on login
+Fix: Make sure Tomcat is running (startup.bat)
+
+Problem: "Database error" in API response
+Fix: Make sure XAMPP MySQL is running and you ran the SQL file
+
+Problem: Maven build fails
+Fix: Make sure JDK is installed and JAVA_HOME is set
+
+Problem: Tomcat doesn't start
+Fix: Check if port 8080 is already in use.
+     Change in C:\tomcat\conf\server.xml (change 8080 to 8081)
+     Then update frontend/js/config.js -> apiBase to the new port.
+
+Problem: Maven build fails with "release version 17 not supported"
+Fix: JAVA_HOME points at an old JDK/JRE. Set it to a JDK 17+ install:
+       set JAVA_HOME=C:\Program Files\Java\jdk-17   (or newer)
+
+Problem: phpMyAdmin not opening
+Fix: Start Apache in XAMPP too (not just MySQL)
+
+===============================================================

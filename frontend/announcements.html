@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Announcements</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.ann-card{border-radius:16px;padding:22px;margin-bottom:14px;border:1px solid;transition:0.3s;position:relative;}
+.ann-card:hover{transform:translateY(-2px);}
+.ann-info{border-color:rgba(59,130,246,0.25);background:rgba(59,130,246,0.05);}
+.ann-warning{border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.06);}
+.ann-event{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.06);}
+.ann-urgent{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);}
+.ann-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.ann-title{font-size:16px;font-weight:700;color:white;}
+.ann-msg{color:#cbd5e1;font-size:14px;line-height:1.7;margin-bottom:10px;}
+.ann-footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;}
+.ann-icon{font-size:28px;margin-bottom:8px;}
+.type-colors{Info:'#60a5fa',Warning:'#f59e0b',Event:'#22c55e',Urgent:'#ef4444'}
+.del-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px;transition:0.2s;}
+.del-btn:hover{color:#ef4444;background:rgba(239,68,68,0.1);}
+</style>
+<script>requireAdmin(); document.write(renderAdminSidebar('announcements'));</script>
+<div class="main">
+  <div class="page-header">
+    <div class="page-title"><h1>Announcements</h1><p>Post notices visible to all residents and staff</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+    <div>
+      <div class="box-header" style="margin-bottom:16px"><span class="box-title">📢 All Announcements</span></div>
+      <div id="annList"><div class="empty-state"><i class="fa fa-spinner spin"></i><br>Loading...</div></div>
+    </div>
+    <div class="box" style="position:sticky;top:20px">
+      <div class="box-header"><span class="box-title">➕ New Announcement</span></div>
+      <div class="fg" style="margin-bottom:14px"><label>Title</label><input type="text" id="annTitle" placeholder="e.g. Water Supply Interruption"></div>
+      <div class="fg" style="margin-bottom:14px"><label>Type</label>
+        <select id="annType">
+          <option value="Info">ℹ Info</option>
+          <option value="Warning">⚠ Warning</option>
+          <option value="Event">🎉 Event</option>
+          <option value="Urgent">🚨 Urgent</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:16px"><label>Message</label><textarea id="annMsg" placeholder="Write your announcement here..." style="min-height:120px"></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="postAnnouncement()"><i class="fa fa-paper-plane"></i> Post Announcement</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const icons={Info:'ℹ️',Warning:'⚠️',Event:'🎉',Urgent:'🚨'};
+const typeColors={Info:'ann-info',Warning:'ann-warning',Event:'ann-event',Urgent:'ann-urgent'};
+const badgeColors={Info:'badge-blue',Warning:'badge-yellow',Event:'badge-green',Urgent:'badge-red'};
+
+async function loadAnnouncements(){
+  try{
+    const res=await fetch(API+'/announcements'); const arr=await res.json();
+    const list=document.getElementById('annList');
+    if(!arr.length){list.innerHTML='<div class="empty-state"><i class="fa fa-bullhorn"></i><br>No announcements posted yet.</div>';return;}
+    list.innerHTML=arr.map(a=>`
+      <div class="ann-card ${typeColors[a.type]||'ann-info'}">
+        <div class="ann-icon">${icons[a.type]||'📢'}</div>
+        <div class="ann-header">
+          <div class="ann-title">${a.title}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge ${badgeColors[a.type]||'badge-blue'}">${a.type}</span>
+            <button class="del-btn" onclick="deleteAnn(${a.id})" title="Delete"><i class="fa fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="ann-msg">${a.message}</div>
+        <div class="ann-footer">
+          <span>Posted by ${a.posted_by_name}</span>
+          <span>${new Date(a.created_at).toLocaleDateString('en-PK',{year:'numeric',month:'short',day:'numeric'})}</span>
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+async function postAnnouncement(){
+  const title=document.getElementById('annTitle').value.trim();
+  const msg=document.getElementById('annMsg').value.trim();
+  const type=document.getElementById('annType').value;
+  if(!title||!msg){showToast('Please fill title and message','error');return;}
+  try{
+    const res=await fetch(API+'/announcements',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({title,message:msg,type,posted_by:user.id})});
+    const data=await res.json();
+    if(data.success){showToast('Announcement posted!','success');document.getElementById('annTitle').value='';document.getElementById('annMsg').value='';loadAnnouncements();}
+  }catch(e){showToast('Failed to post','error');}
+}
+
+async function deleteAnn(id){
+  if(!confirm('Delete this announcement?'))return;
+  try{await fetch(API+'/announcements?id='+id,{method:'DELETE'});showToast('Deleted','success');loadAnnouncements();}
+  catch(e){showToast('Delete failed','error');}
+}
+
+function showToast(msg,type){const t=document.getElementById('toast');t.className=`toast toast-${type} show`;t.innerHTML=`<i class="fa ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;setTimeout(()=>t.classList.remove('show'),3000);}
+loadAnnouncements();
+</script>
+</body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Resident Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.res-sidebar{width:260px;height:100vh;position:fixed;left:0;top:0;background:rgba(10,14,26,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;justify-content:space-between;}
+.res-nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:0.2s;margin-bottom:4px;}
+.res-nav a:hover,.res-nav a.active{background:rgba(99,102,241,0.15);color:var(--purple-light);}
+.tab-content{display:none;}.tab-content.active{display:block;}
+.bill-row{background:var(--surface);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border:1px solid var(--border);transition:0.2s;}
+.bill-row:hover{border-color:rgba(99,102,241,0.3);}
+.bill-info h4{font-size:14px;font-weight:700;margin-bottom:3px;}
+.bill-info small{color:var(--muted);font-size:12px;}
+.bill-amt{font-size:18px;font-weight:800;}
+.c-mini-card{background:var(--surface);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid var(--border);transition:0.2s;}
+.c-mini-card:hover{border-color:rgba(99,102,241,0.3);}
+.ann-mini{background:var(--surface);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid var(--border);}
+.ann-mini h4{font-size:14px;font-weight:700;margin-bottom:6px;}
+.ann-mini p{font-size:13px;color:var(--muted);line-height:1.6;}
+</style>
+
+<aside class="res-sidebar">
+  <div>
+    <div class="brand"><div class="brand-icon">🏘</div><div><h3>SCMS</h3><small>Resident Portal</small></div></div>
+    <div style="margin-top:20px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:20px">
+      <div class="avatar" style="width:48px;height:48px;font-size:20px;border-radius:14px;margin-bottom:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6)" id="rAvatar">R</div>
+      <div style="font-size:15px;font-weight:700" id="rName">Resident</div>
+      <div style="color:var(--muted);font-size:12px" id="rApt">Apartment</div>
+    </div>
+    <nav class="res-nav">
+      <a href="#" class="active" onclick="switchTab('dashboard',this)">🏠 Dashboard</a>
+      <a href="#" onclick="switchTab('bills',this)">💰 My Bills</a>
+      <a href="#" onclick="switchTab('complaints',this)">📋 My Complaints</a>
+      <a href="#" onclick="switchTab('visitors',this)">👤 Add Visitor</a>
+      <a href="#" onclick="switchTab('notices',this)">📢 Notices</a>
+    </nav>
+  </div>
+  <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+</aside>
+
+<div class="main">
+  <!-- DASHBOARD TAB -->
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="page-header"><div class="page-title"><h1 id="welcomeMsg">Welcome!</h1><p id="clockEl">Loading...</p></div></div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><h2 id="rs1" style="color:#818cf8">--</h2><p>My Bills</p></div>
+      <div class="stat-card"><h2 id="rs2" style="color:#f59e0b">--</h2><p>Pending Bills</p></div>
+      <div class="stat-card"><h2 id="rs3" style="color:#ef4444">--</h2><p>My Complaints</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="box"><div class="box-header"><span class="box-title">💰 Recent Bills</span><a href="#" onclick="switchTab('bills',document.querySelector('.res-nav a:nth-child(2)'))" style="color:var(--purple-light);font-size:13px;text-decoration:none">View all →</a></div><div id="dashBills"><div style="color:var(--muted);font-size:13px">Loading...</div></div></div>
+      <div class="box"><div class="box-header"><span class="box-title">📢 Community Notices</span></div><div id="dashNotices"><div style="color:var(--muted);font-size:13px">Loading...</div></div></div>
+    </div>
+  </div>
+
+  <!-- BILLS TAB -->
+  <div id="tab-bills" class="tab-content">
+    <div class="page-header"><div class="page-title"><h1>My Bills</h1><p>Your maintenance and service charges</p></div></div>
+    <div id="billsList"><div class="empty-state"><i class="fa fa-spinner spin"></i></div></div>
+  </div>
+
+  <!-- COMPLAINTS TAB -->
+  <div id="tab-complaints" class="tab-content">
+    <div class="page-header"><div class="page-title"><h1>My Complaints</h1><p>Track and submit your complaints</p></div></div>
+    <div class="box" style="margin-bottom:20px">
+      <div class="box-header"><span class="box-title">✍️ Submit New Complaint</span></div>
+      <div class="form-grid">
+        <div class="fg"><label>Category</label>
+          <select id="cCat"><option>Maintenance</option><option>Electrical</option><option>Security</option><option>Water</option><option>Other</option></select>
+        </div>
+        <div class="fg"><label>Priority</label>
+          <select id="cPrio"><option>Low</option><option selected>Medium</option><option>High</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>Description</label><textarea id="cDesc" placeholder="Describe the issue in detail..."></textarea></div>
+      <button class="btn btn-primary" onclick="submitComplaint()"><i class="fa fa-paper-plane"></i> Submit Complaint</button>
+      <div id="cSuccess" style="display:none;margin-top:10px;color:#22c55e;font-size:13px">✓ Complaint submitted!</div>
+    </div>
+    <div id="myComplaints"><div class="empty-state"><i class="fa fa-spinner spin"></i></div></div>
+  </div>
+
+  <!-- ADD VISITOR TAB -->
+  <div id="tab-visitors" class="tab-content">
+    <div class="page-header"><div class="page-title"><h1>Add Visitor</h1><p>Pre-register a visitor for your apartment</p></div></div>
+    <div class="box" style="max-width:700px">
+      <div class="box-header"><span class="box-title">🚪 Register Visitor for My Apartment</span></div>
+      <div class="form-grid">
+        <div class="fg"><label>Visitor Name *</label><input type="text" id="rvName" placeholder="Full name"></div>
+        <div class="fg"><label>CNIC</label><input type="text" id="rvCnic" placeholder="35202-XXXXXXX-X"></div>
+        <div class="fg"><label>Purpose</label>
+          <select id="rvPurpose"><option>Guest</option><option>Delivery</option><option>Maintenance</option></select>
+        </div>
+        <div class="fg"><label>Vehicle Number</label><input type="text" id="rvVehicle" placeholder="ABC-1234"></div>
+        <div class="fg"><label>Visit Time</label><input type="time" id="rvTime"></div>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>Notes</label><textarea id="rvNotes" placeholder="Any special instructions..."></textarea></div>
+      <button class="btn btn-primary" onclick="addVisitor()"><i class="fa fa-plus-circle"></i> Register Visitor</button>
+      <div id="rvSuccess" style="display:none;margin-top:10px;padding:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;color:#22c55e;font-size:13px">✓ Visitor registered! Pending guard/admin approval.</div>
+    </div>
+  </div>
+
+  <!-- NOTICES TAB -->
+  <div id="tab-notices" class="tab-content">
+    <div class="page-header"><div class="page-title"><h1>Community Notices</h1><p>Important announcements from management</p></div></div>
+    <div id="noticesList"><div class="empty-state"><i class="fa fa-spinner spin"></i></div></div>
+  </div>
+</div>
+
+<script>
+requireResident();
+document.getElementById('rName').textContent = user.name;
+document.getElementById('rApt').textContent = user.apartment || 'Resident';
+document.getElementById('rAvatar').textContent = (user.name||'R')[0].toUpperCase();
+document.getElementById('welcomeMsg').textContent = `Welcome, ${user.name}! 👋`;
+
+function updateClock(){document.getElementById('clockEl').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' · '+new Date().toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit'});}
+setInterval(updateClock,1000); updateClock();
+
+function switchTab(name, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.res-nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+async function loadDashboard(){
+  try{
+    const res=await fetch(API+'/bills?resident_id='+user.id); const bills=await res.json();
+    document.getElementById('rs1').textContent=bills.length;
+    document.getElementById('rs2').textContent=bills.filter(b=>b.status==='Pending').length;
+    const bc={Paid:'badge-green',Pending:'badge-yellow',Overdue:'badge-red'};
+    document.getElementById('dashBills').innerHTML=bills.slice(0,3).map(b=>`
+      <div class="bill-row">
+        <div class="bill-info"><h4>${b.service}</h4><small>${b.month}</small></div>
+        <div><div class="bill-amt" style="color:${b.status==='Paid'?'#22c55e':'#f59e0b'}">Rs. ${parseFloat(b.amount).toLocaleString()}</div>
+        <span class="badge ${bc[b.status]}">${b.status}</span></div>
+      </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No bills found.</div>';
+  }catch(e){}
+  try{
+    const res=await fetch(API+'/complaints'); const all=await res.json();
+    const mine=all.filter(c=>c.resident_name===user.name);
+    document.getElementById('rs3').textContent=mine.length;
+  }catch(e){}
+  try{
+    const res=await fetch(API+'/announcements'); const anns=await res.json();
+    const icons={Info:'ℹ️',Warning:'⚠️',Event:'🎉',Urgent:'🚨'};
+    document.getElementById('dashNotices').innerHTML=anns.slice(0,3).map(a=>`
+      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">${icons[a.type]||'📢'} ${a.title}</div>
+        <div style="font-size:12px;color:var(--muted)">${a.message.substring(0,80)}...</div>
+      </div>`).join('')||'<div style="color:var(--muted);font-size:13px">No announcements.</div>';
+  }catch(e){}
+}
+
+async function loadBills(){
+  try{
+    const res=await fetch(API+'/bills?resident_id='+user.id); const bills=await res.json();
+    const bc={Paid:'badge-green',Pending:'badge-yellow',Overdue:'badge-red'};
+    document.getElementById('billsList').innerHTML=bills.length?bills.map(b=>`
+      <div class="bill-row">
+        <div class="bill-info"><h4>${b.service}</h4><small>${b.month}</small></div>
+        <div style="text-align:right"><div class="bill-amt" style="color:${b.status==='Paid'?'#22c55e':'#f59e0b'}">Rs. ${parseFloat(b.amount).toLocaleString()}</div>
+        <span class="badge ${bc[b.status]}">${b.status}</span></div>
+      </div>`).join(''):'<div class="empty-state"><i class="fa fa-receipt"></i><br>No bills found.</div>';
+  }catch(e){}
+}
+
+async function loadComplaints(){
+  try{
+    const res=await fetch(API+'/complaints'); const all=await res.json();
+    const mine=all.filter(c=>c.resident_name===user.name);
+    const bc={Open:'badge-red',Pending:'badge-yellow',Resolved:'badge-green'};
+    document.getElementById('myComplaints').innerHTML=mine.length?mine.map(c=>`
+      <div class="c-mini-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:13px;font-weight:600">${c.category} · ${c.priority} Priority</span>
+          <span class="badge ${bc[c.status]}">${c.status}</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6">${c.description}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">${c.created_at?c.created_at.split('T')[0]:''}</div>
+      </div>`).join(''):'<div class="empty-state"><i class="fa fa-clipboard"></i><br>No complaints submitted yet.</div>';
+  }catch(e){}
+}
+
+async function loadNotices(){
+  try{
+    const res=await fetch(API+'/announcements'); const anns=await res.json();
+    const icons={Info:'ℹ️',Warning:'⚠️',Event:'🎉',Urgent:'🚨'};
+    const typeColors={Info:'rgba(59,130,246,0.08)',Warning:'rgba(245,158,11,0.08)',Event:'rgba(34,197,94,0.08)',Urgent:'rgba(239,68,68,0.08)'};
+    document.getElementById('noticesList').innerHTML=anns.length?anns.map(a=>`
+      <div class="ann-mini" style="background:${typeColors[a.type]||'var(--surface)'}">
+        <h4>${icons[a.type]||'📢'} ${a.title}</h4>
+        <p>${a.message}</p>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">${new Date(a.created_at).toLocaleDateString()}</div>
+      </div>`).join(''):'<div class="empty-state"><i class="fa fa-bullhorn"></i><br>No announcements.</div>';
+  }catch(e){}
+}
+
+async function submitComplaint(){
+  const desc=document.getElementById('cDesc').value.trim();
+  if(!desc){alert('Please write a description.');return;}
+  try{
+    const res=await fetch(API+'/complaints',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({resident_id:user.id,apartment:user.apartment||'',category:document.getElementById('cCat').value,priority:document.getElementById('cPrio').value,description:desc})});
+    const data=await res.json();
+    if(data.success){document.getElementById('cSuccess').style.display='block';document.getElementById('cDesc').value='';setTimeout(()=>document.getElementById('cSuccess').style.display='none',4000);loadComplaints();}
+  }catch(e){alert('Failed to submit.');}
+}
+
+async function addVisitor(){
+  const name=document.getElementById('rvName').value.trim();
+  if(!name){alert('Visitor name is required.');return;}
+  try{
+    const res=await fetch(API+'/visitors',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({visitor_name:name,cnic:document.getElementById('rvCnic').value.trim(),house_number:user.apartment||'',purpose:document.getElementById('rvPurpose').value,vehicle_number:document.getElementById('rvVehicle').value.trim(),visit_time:document.getElementById('rvTime').value,notes:document.getElementById('rvNotes').value.trim(),added_by:user.id})});
+    const data=await res.json();
+    if(data.success){document.getElementById('rvSuccess').style.display='block';document.getElementById('rvName').value='';setTimeout(()=>document.getElementById('rvSuccess').style.display='none',5000);}
+  }catch(e){alert('Failed to register visitor.');}
+}
+
+loadDashboard(); loadBills(); loadComplaints(); loadNotices();
+</script>
+</body></html>

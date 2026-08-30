@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SCMS Complaint Management</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    display:flex;
+    min-height:100vh;
+    background:#0f172a;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    background:rgba(255,255,255,0.04);
+    backdrop-filter:blur(20px);
+    border-right:1px solid rgba(255,255,255,0.08);
+    padding:25px 18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:34px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.menu{
+    list-style:none;
+}
+
+.menu li{
+    margin-bottom:10px;
+}
+
+.menu li a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    padding:14px 16px;
+    border-radius:16px;
+    transition:0.3s;
+}
+
+.menu li a i{
+    font-size:22px;
+    margin-right:12px;
+}
+
+.menu li a:hover,
+.menu li a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    transform:translateX(5px);
+}
+
+/* PROFILE */
+
+.profile-box{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:20px;
+}
+
+.profile-box img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+}
+
+.profile-box small{
+    color:#94a3b8;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:270px;
+    width:calc(100% - 270px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:rgba(255,255,255,0.05);
+    padding:12px 15px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box input{
+    width:100%;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+    margin-left:10px;
+}
+
+.top-icons{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.top-icons i{
+    font-size:24px;
+    cursor:pointer;
+}
+
+/* PAGE TITLE */
+
+.page-title{
+    margin-bottom:30px;
+}
+
+.page-title h1{
+    font-size:35px;
+}
+
+.page-title p{
+    color:#94a3b8;
+    margin-top:8px;
+}
+
+/* CONTAINER */
+
+.container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+/* CARD */
+
+.card{
+    background:rgba(255,255,255,0.04);
+    padding:30px;
+    border-radius:25px;
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+/* FORM */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:10px;
+    font-weight:500;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:14px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:#0f172a;
+    color:white;
+    font-size:15px;
+}
+
+textarea{
+    height:140px;
+    resize:none;
+}
+
+/* BUTTON */
+
+.btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+
+/* COMPLAINT BOX */
+
+.complaint-box{
+    background:#0f172a;
+    padding:20px;
+    border-radius:18px;
+    margin-bottom:20px;
+    border-left:5px solid #6366f1;
+    transition:0.3s;
+}
+
+.complaint-box:hover{
+    transform:translateY(-4px);
+}
+
+.complaint-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.status{
+    padding:6px 12px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.progress{
+    background:#f59e0b33;
+    color:#f59e0b;
+}
+
+.resolved{
+    background:#10b98133;
+    color:#10b981;
+}
+
+.high{
+    background:#ef444433;
+    color:#ef4444;
+}
+
+.low{
+    background:#3b82f633;
+    color:#3b82f6;
+}
+
+.complaint-box p{
+    color:#94a3b8;
+    line-height:1.6;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:992px){
+
+    .sidebar{
+        width:90px;
+    }
+
+    .logo span,
+    .menu li a span,
+    .profile-box div{
+        display:none;
+    }
+
+    .menu li a{
+        justify-content:center;
+    }
+
+    .menu li a i{
+        margin:0;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+}
+
+@media(max-width:900px){
+
+    .container{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div>
+
+        <div class="logo">
+
+            <i class='bx bx-building-house'></i>
+
+            <span>SCMS</span>
+
+        </div>
+
+        <ul class="menu">
+
+            <li>
+                <a href="resident.html">
+                    <i class='bx bx-grid-alt'></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="bills.html">
+                    <i class='bx bx-wallet'></i>
+                    <span>Bills</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="complaint-page.html" class="active">
+                    <i class='bx bx-message-square-detail'></i>
+                    <span>Complaints</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="parking-page.html">
+                    <i class='bx bx-car'></i>
+                    <span>Parking</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="visitors-page.html">
+                    <i class='bx bx-group'></i>
+                    <span>Visitors</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="profile.html">
+                    <i class='bx bx-user'></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+
+            <li style="margin-top:20px;">
+                <a href="index.html" style="color:#ef4444;">
+                    <i class='bx bx-log-out'></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="profile-box">
+
+        <img src="https://i.pravatar.cc/100">
+
+        <div>
+            <h4>Resident Panel</h4>
+            <small>Community Member</small>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search complaints...">
+
+        </div>
+
+        <div class="top-icons">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-message-rounded'></i>
+
+        </div>
+
+    </div>
+
+    <!-- PAGE TITLE -->
+
+    <div class="page-title">
+
+        <h1>
+            Complaint Management
+        </h1>
+
+        <p>
+            Submit and track your community complaints easily
+        </p>
+
+    </div>
+
+    <!-- CONTAINER -->
+
+    <div class="container">
+
+        <!-- LEFT SIDE -->
+
+        <div class="card">
+
+            <h2 style="margin-bottom:25px;">
+                Submit New Complaint
+            </h2>
+
+            <div class="form-group">
+
+                <label>
+                    Complaint Title
+                </label>
+
+                <input type="text" placeholder="Enter complaint title">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Complaint Details
+                </label>
+
+                <textarea placeholder="Write your complaint here..."></textarea>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Priority Level
+                </label>
+
+                <select>
+
+                    <option>Low Priority</option>
+                    <option>Medium Priority</option>
+                    <option>High Priority</option>
+
+                </select>
+
+            </div>
+
+            <button class="btn">
+
+                <i class='bx bx-send'></i>
+
+                Submit Complaint
+
+            </button>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="card">
+
+            <h2 style="margin-bottom:25px;">
+                Previous Complaints
+            </h2>
+
+            <div class="complaint-box">
+
+                <div class="complaint-top">
+
+                    <h3>
+                        Water Leakage
+                    </h3>
+
+                    <span class="status progress">
+                        In Progress
+                    </span>
+
+                </div>
+
+                <p>
+                    Leakage issue reported near Block A basement parking area.
+                </p>
+
+            </div>
+
+            <div class="complaint-box">
+
+                <div class="complaint-top">
+
+                    <h3>
+                        Lift Issue
+                    </h3>
+
+                    <span class="status resolved">
+                        Resolved
+                    </span>
+
+                </div>
+
+                <p>
+                    Elevator maintenance completed successfully.
+                </p>
+
+            </div>
+
+            <div class="complaint-box">
+
+                <div class="complaint-top">
+
+                    <h3>
+                        Security Camera Problem
+                    </h3>
+
+                    <span class="status high">
+                        High Priority
+                    </span>
+
+                </div>
+
+                <p>
+                    CCTV camera near main gate is not working properly.
+                </p>
+
+            </div>
+
+            <div class="complaint-box">
+
+                <div class="complaint-top">
+
+                    <h3>
+                        Street Light Damage
+                    </h3>
+
+                    <span class="status low">
+                        Low Priority
+                    </span>
+
+                </div>
+
+                <p>
+                    Street light near parking area needs replacement.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+
+</html>

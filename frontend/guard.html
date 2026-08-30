@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Guard Panel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.guard-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start;}
+.recent-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;transition:0.2s;}
+.recent-card:hover{border-color:rgba(99,102,241,0.3);}
+.rc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.rc-name{font-size:14px;font-weight:700;}
+.rc-detail{display:flex;gap:14px;flex-wrap:wrap;}
+.rc-item{font-size:12px;color:var(--muted);}
+.rc-item span{color:var(--text);font-weight:500;}
+.guard-sidebar{width:260px;height:100vh;position:fixed;left:0;top:0;background:rgba(10,14,26,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;justify-content:space-between;}
+@media(max-width:900px){.guard-layout{grid-template-columns:1fr;}}
+</style>
+
+<!-- Guard sidebar -->
+<aside class="guard-sidebar">
+  <div>
+    <div class="brand"><div class="brand-icon">🛡</div><div><h3>SCMS</h3><small>Guard Panel</small></div></div>
+    <div style="margin-top:24px;padding:16px;background:var(--surface);border-radius:14px;border:1px solid var(--border);">
+      <div class="avatar" style="width:48px;height:48px;font-size:20px;border-radius:14px;margin-bottom:12px;background:linear-gradient(135deg,#059669,#10b981)" id="gAvatar">G</div>
+      <div style="font-size:15px;font-weight:700" id="gName">Guard</div>
+      <div style="color:var(--muted);font-size:12px">Security Personnel</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)" id="gClock"></div>
+    </div>
+    <div style="margin-top:20px;padding:14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:14px;">
+      <div style="font-size:12px;color:#22c55e;font-weight:700;margin-bottom:4px">🟢 ON DUTY</div>
+      <div style="font-size:12px;color:var(--muted)">Gate Entry Control</div>
+    </div>
+    <div style="margin-top:14px;background:var(--surface);border-radius:14px;padding:14px;border:1px solid var(--border)">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Today's Entries</div>
+      <div style="font-size:28px;font-weight:800;color:#f59e0b" id="todayCount">0</div>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+</aside>
+
+<div class="main">
+  <div class="page-header"><div class="page-title"><h1>Gate Entry Management</h1><p>Register and monitor visitor entries</p></div></div>
+  <div class="guard-layout">
+    <div>
+      <div class="box" style="margin-bottom:20px">
+        <div class="box-header"><span class="box-title">🚪 Register New Visitor</span></div>
+        <div class="form-grid">
+          <div class="fg"><label>Visitor Name *</label><input type="text" id="vName" placeholder="Full name"></div>
+          <div class="fg"><label>CNIC</label><input type="text" id="vCnic" placeholder="35202-XXXXXXX-X"></div>
+          <div class="fg"><label>House Number *</label><input type="text" id="vHouse" placeholder="A-203"></div>
+          <div class="fg"><label>Purpose</label>
+            <select id="vPurpose"><option>Guest</option><option>Delivery</option><option>Maintenance</option><option>Emergency</option></select>
+          </div>
+          <div class="fg"><label>Vehicle Number</label><input type="text" id="vVehicle" placeholder="ABC-1234"></div>
+          <div class="fg"><label>Visit Time</label><input type="time" id="vTime"></div>
+        </div>
+        <div class="fg" style="margin-bottom:16px"><label>Notes</label><textarea id="vNotes" placeholder="Any additional information..."></textarea></div>
+        <button class="btn btn-primary" id="regBtn" onclick="registerVisitor()"><i class="fa fa-plus-circle"></i> Register Visitor</button>
+        <div id="successMsg" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;color:#22c55e;font-size:13px;font-weight:600">
+          ✓ Visitor registered successfully! Status: Pending admin approval.
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="box">
+        <div class="box-header"><span class="box-title">📋 Today's Visitors</span>
+          <button class="btn btn-sm" style="background:var(--surface2);color:var(--muted)" onclick="loadRecent()"><i class="fa fa-rotate"></i></button>
+        </div>
+        <div id="recentList"><div class="empty-state"><i class="fa fa-spinner spin"></i></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+requireGuard();
+document.getElementById('gName').textContent = user.name || 'Guard';
+document.getElementById('gAvatar').textContent = (user.name||'G')[0].toUpperCase();
+function updateClock(){document.getElementById('gClock').textContent=new Date().toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+setInterval(updateClock,1000); updateClock();
+
+async function registerVisitor(){
+  const name=document.getElementById('vName').value.trim();
+  const house=document.getElementById('vHouse').value.trim();
+  if(!name||!house){alert('Visitor name and house number are required.');return;}
+  const btn=document.getElementById('regBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner spin"></i> Registering...';
+  try{
+    const res=await fetch(API+'/visitors',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({visitor_name:name,cnic:document.getElementById('vCnic').value.trim(),house_number:house,purpose:document.getElementById('vPurpose').value,vehicle_number:document.getElementById('vVehicle').value.trim(),visit_time:document.getElementById('vTime').value,notes:document.getElementById('vNotes').value.trim(),added_by:user.id})});
+    const data=await res.json();
+    if(data.success){
+      document.getElementById('successMsg').style.display='block';
+      setTimeout(()=>document.getElementById('successMsg').style.display='none',4000);
+      ['vName','vCnic','vHouse','vVehicle','vTime','vNotes'].forEach(id=>document.getElementById(id).value='');
+      loadRecent();
+    }
+  }catch(e){alert('Failed to register. Is Tomcat running?');}
+  btn.disabled=false; btn.innerHTML='<i class="fa fa-plus-circle"></i> Register Visitor';
+}
+
+async function loadRecent(){
+  try{
+    const res=await fetch(API+'/visitors'); const all=await res.json();
+    const today=new Date().toISOString().split('T')[0];
+    const todayV=all.filter(v=>v.created_at&&v.created_at.startsWith(today));
+    document.getElementById('todayCount').textContent=todayV.length;
+    const list=document.getElementById('recentList');
+    if(!todayV.length){list.innerHTML='<div class="empty-state" style="padding:20px"><i class="fa fa-clock"></i><br>No visitors today</div>';return;}
+    const bc={Approved:'badge-green',Pending:'badge-yellow',Rejected:'badge-red'};
+    list.innerHTML=todayV.map(v=>`
+      <div class="recent-card">
+        <div class="rc-top"><div class="rc-name">${v.visitor_name}</div><span class="badge ${bc[v.status]||'badge-blue'}">${v.status}</span></div>
+        <div class="rc-detail">
+          <div class="rc-item">House: <span>${v.house_number}</span></div>
+          <div class="rc-item">Purpose: <span>${v.purpose}</span></div>
+          ${v.vehicle_number?`<div class="rc-item">Vehicle: <span>${v.vehicle_number}</span></div>`:''}
+          ${v.visit_time?`<div class="rc-item">Time: <span>${v.visit_time}</span></div>`:''}
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+loadRecent();
+</script>
+</body></html>

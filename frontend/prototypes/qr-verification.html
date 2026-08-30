@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>QR Verification | SCMS Guard</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+    display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    background:#111827;
+    padding:25px 18px;
+    position:fixed;
+    top:0;
+    left:0;
+    height:100%;
+    border-right:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:32px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.nav-links{
+    list-style:none;
+}
+
+.nav-links li{
+    margin-bottom:12px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    padding:14px 16px;
+    border-radius:14px;
+    transition:0.3s;
+}
+
+.nav-links a i{
+    font-size:22px;
+    margin-right:12px;
+}
+
+.nav-links a:hover,
+.nav-links a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:260px;
+    width:calc(100% - 260px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:#1e293b;
+    padding:12px 15px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box i{
+    color:#818cf8;
+    font-size:18px;
+}
+
+.search-box input{
+    width:100%;
+    margin-left:10px;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+}
+
+.top-icons{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.top-icons i{
+    font-size:24px;
+    color:#cbd5e1;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.top-icons i:hover{
+    color:#818cf8;
+}
+
+#clock{
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+/* PAGE TITLE */
+
+.page-title{
+    margin-bottom:30px;
+}
+
+.page-title h1{
+    font-size:34px;
+}
+
+.page-title p{
+    color:#94a3b8;
+    margin-top:8px;
+}
+
+/* QR BOX */
+
+.qr-container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:25px;
+    padding:35px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* QR DISPLAY */
+
+.qr-box{
+    text-align:center;
+}
+
+.qr-box img{
+    width:240px;
+    background:white;
+    padding:15px;
+    border-radius:20px;
+    margin:25px 0;
+}
+
+.status{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:30px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.approved{
+    background:#10b98133;
+    color:#10b981;
+}
+
+/* FORM */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:10px;
+    color:#cbd5e1;
+}
+
+input,
+select{
+    width:100%;
+    padding:15px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:#0f172a;
+    color:white;
+    font-size:15px;
+}
+
+.btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+
+/* ACTIVITY */
+
+.activity{
+    margin-top:25px;
+}
+
+.activity-box{
+    background:#0f172a;
+    padding:18px;
+    border-radius:16px;
+    margin-bottom:15px;
+    border-left:4px solid #6366f1;
+}
+
+.activity-box h4{
+    margin-bottom:5px;
+}
+
+.activity-box p{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:950px){
+
+    .sidebar{
+        width:90px;
+    }
+
+    .logo span,
+    .nav-links span{
+        display:none;
+    }
+
+    .nav-links a{
+        justify-content:center;
+    }
+
+    .nav-links a i{
+        margin:0;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+
+    .qr-container{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .search-box{
+        width:100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">
+
+        <i class='bx bx-shield-quarter'></i>
+
+        <span>SCMS Guard</span>
+
+    </div>
+
+    <ul class="nav-links">
+
+        <li>
+            <a href="guard.html">
+                <i class='bx bx-grid-alt'></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="add-visitor.html">
+                <i class='bx bx-user-plus'></i>
+                <span>Add Visitor</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="visitor-records.html">
+                <i class='bx bx-list-ul'></i>
+                <span>Visitor Records</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="qr-verification.html" class="active">
+                <i class='bx bx-qr-scan'></i>
+                <span>QR Verification</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="parking-monitor.html">
+                <i class='bx bx-car'></i>
+                <span>Parking Monitor</span>
+            </a>
+        </li>
+
+        <li style="margin-top:20px;">
+            <a href="index.html" style="color:#ef4444;">
+                <i class='bx bx-log-out'></i>
+                <span>Logout</span>
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search visitor QR...">
+
+        </div>
+
+        <div class="top-icons">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-shield'></i>
+
+        </div>
+
+    </div>
+
+    <!-- PAGE TITLE -->
+
+    <div class="page-title">
+
+        <h1>QR Verification</h1>
+
+        <p>
+            Verify visitor access passes and monitor security activity
+        </p>
+
+    </div>
+
+    <!-- QR SECTION -->
+
+    <div class="qr-container">
+
+        <!-- LEFT -->
+
+        <div class="card qr-box">
+
+            <h2>Visitor QR Pass</h2>
+
+            <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=SCMS-Visitor">
+
+            <br>
+
+            <span class="status approved">
+                Verified Access
+            </span>
+
+            <br><br>
+
+            <button class="btn">
+                <i class='bx bx-check-circle'></i>
+                Verify QR Code
+            </button>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="card">
+
+            <h2 style="margin-bottom:25px;">
+                Verification Details
+            </h2>
+
+            <div class="form-group">
+
+                <label>Visitor Name</label>
+
+                <input type="text" value="Ali Raza">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>House Number</label>
+
+                <input type="text" value="A-102">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Visit Purpose</label>
+
+                <select>
+
+                    <option>Guest</option>
+                    <option>Delivery</option>
+                    <option>Maintenance</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Verification Status</label>
+
+                <input type="text" value="Approved">
+
+            </div>
+
+            <button class="btn">
+                <i class='bx bx-scan'></i>
+                Scan Another QR
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ACTIVITY -->
+
+    <div class="card activity">
+
+        <h2 style="margin-bottom:25px;">
+            Recent QR Activity
+        </h2>
+
+        <div class="activity-box">
+
+            <h4>QR Pass Verified</h4>
+
+            <p>
+                Ali Raza entered society successfully • 2:15 PM
+            </p>
+
+        </div>
+
+        <div class="activity-box">
+
+            <h4>Delivery Access Approved</h4>
+
+            <p>
+                Food delivery rider verified at Gate 1 • 1:45 PM
+            </p>
+
+        </div>
+
+        <div class="activity-box">
+
+            <h4>Maintenance Staff Checked</h4>
+
+            <p>
+                Electrician QR scanned at Block C • 12:20 PM
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+
+</html>

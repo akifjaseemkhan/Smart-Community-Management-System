@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Complaints</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.c-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;transition:0.3s;}
+.c-card:hover{transform:translateY(-2px);border-color:rgba(99,102,241,0.25);}
+.c-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;}
+.c-user{display:flex;align-items:center;gap:12px;}
+.c-av{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#f97316);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;flex-shrink:0;}
+.c-name{font-size:14px;font-weight:700;}
+.c-apt{color:var(--muted);font-size:12px;}
+.c-desc{color:#cbd5e1;font-size:13.5px;line-height:1.6;margin-bottom:12px;}
+.c-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--surface2);color:var(--muted);}
+.c-actions{display:flex;gap:8px;}
+.btn-resolve{background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.2);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;transition:0.2s;}
+.btn-resolve:hover{background:#22c55e;color:white;}
+.btn-pend{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;transition:0.2s;}
+.btn-pend:hover{background:#f59e0b;color:white;}
+.priority-high{border-left:3px solid #ef4444;}
+.priority-medium{border-left:3px solid #f59e0b;}
+.priority-low{border-left:3px solid #22c55e;}
+</style>
+<script>requireAdmin(); document.write(renderAdminSidebar('complaints'));</script>
+<div class="main">
+  <div class="page-header">
+    <div class="page-title"><h1>Complaints Management</h1><p>Review and resolve resident complaints</p></div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card"><h2 id="c1" style="color:#ef4444">--</h2><p>Open</p></div>
+    <div class="stat-card"><h2 id="c2" style="color:#f59e0b">--</h2><p>Pending</p></div>
+    <div class="stat-card"><h2 id="c3" style="color:#22c55e">--</h2><p>Resolved</p></div>
+  </div>
+  <div class="box">
+    <div class="box-header"><span class="box-title">All Complaints</span></div>
+    <div class="search-bar"><i class="fa fa-search"></i><input type="text" id="searchInput" placeholder="Search by resident, category, or description..." oninput="render()"></div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('All',this)">All</button>
+      <button class="filter-tab" onclick="setFilter('Open',this)">🔴 Open</button>
+      <button class="filter-tab" onclick="setFilter('Pending',this)">🟡 Pending</button>
+      <button class="filter-tab" onclick="setFilter('Resolved',this)">🟢 Resolved</button>
+      <button class="filter-tab" onclick="setFilter('High',this)">🔥 High Priority</button>
+    </div>
+    <div id="cContainer"><div class="empty-state"><i class="fa fa-spinner spin"></i><br>Loading...</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+let allC=[]; let currentFilter='All';
+async function loadComplaints(){
+  try{const res=await fetch(API+'/complaints'); allC=await res.json(); updateStats(); render();}
+  catch(e){document.getElementById('cContainer').innerHTML='<div class="empty-state">Failed to load.</div>';}
+}
+function updateStats(){
+  document.getElementById('c1').textContent=allC.filter(c=>c.status==='Open').length;
+  document.getElementById('c2').textContent=allC.filter(c=>c.status==='Pending').length;
+  document.getElementById('c3').textContent=allC.filter(c=>c.status==='Resolved').length;
+}
+function render(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let filtered=allC.filter(c=>{
+    const matchFilter=currentFilter==='All'||c.status===currentFilter||(currentFilter==='High'&&c.priority==='High');
+    const matchSearch=(c.resident_name||'').toLowerCase().includes(q)||(c.category||'').toLowerCase().includes(q)||(c.description||'').toLowerCase().includes(q);
+    return matchFilter&&matchSearch;
+  });
+  const container=document.getElementById('cContainer');
+  if(!filtered.length){container.innerHTML='<div class="empty-state"><i class="fa fa-clipboard"></i><br>No complaints found.</div>';return;}
+  const badgeClass={Open:'badge-red',Pending:'badge-yellow',Resolved:'badge-green'};
+  const prioClass={High:'priority-high',Medium:'priority-medium',Low:'priority-low'};
+  container.innerHTML=filtered.map(c=>`
+    <div class="c-card ${prioClass[c.priority]||''}">
+      <div class="c-top">
+        <div class="c-user">
+          <div class="c-av">${(c.resident_name||'R')[0].toUpperCase()}</div>
+          <div><div class="c-name">${c.resident_name||'Resident'}</div><div class="c-apt">${c.apartment||'N/A'} · #CMP${c.id}</div></div>
+        </div>
+        <span class="badge ${badgeClass[c.status]||'badge-blue'}">${c.status}</span>
+      </div>
+      <div class="c-desc">${c.description}</div>
+      <div class="c-chips">
+        <span class="chip">📁 ${c.category}</span>
+        <span class="chip" style="color:${c.priority==='High'?'#ef4444':c.priority==='Medium'?'#f59e0b':'#22c55e'}">🔥 ${c.priority} Priority</span>
+        <span class="chip">📅 ${c.created_at?c.created_at.split('T')[0]:''}</span>
+      </div>
+      <div class="c-actions">
+        ${c.status!=='Resolved'?`<button class="btn-resolve" onclick="updateStatus(${c.id},'Resolved')">✓ Mark Resolved</button>`:''}
+        ${c.status==='Open'?`<button class="btn-pend" onclick="updateStatus(${c.id},'Pending')">Set Pending</button>`:''}
+      </div>
+    </div>`).join('');
+}
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); render();
+}
+async function updateStatus(id,status){
+  try{
+    await fetch(API+'/complaints',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status})});
+    showToast('Complaint updated!','success'); loadComplaints();
+  }catch(e){showToast('Update failed','error');}
+}
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.className=`toast toast-${type} show`;
+  t.innerHTML=`<i class="fa ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+loadComplaints();
+</script>
+</body></html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Admin Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;}
+.chart-box h3{font-size:15px;font-weight:700;margin-bottom:20px;color:white;}
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;}
+.qa-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;
+  text-decoration:none;color:var(--text);transition:0.3s;display:flex;align-items:center;gap:14px;}
+.qa-card:hover{border-color:var(--purple);transform:translateY(-3px);background:var(--surface2);}
+.qa-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.qa-card h4{font-size:14px;font-weight:600;margin-bottom:3px;}
+.qa-card small{color:var(--muted);font-size:12px;}
+.announce-item{padding:14px 0;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;}
+.announce-item:last-child{border-bottom:none;}
+.ann-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.ann-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+.ann-msg{font-size:13px;color:var(--muted);line-height:1.5;}
+.ann-time{font-size:11px;color:var(--muted);margin-top:4px;}
+@media(max-width:768px){.charts-row{grid-template-columns:1fr;}}
+</style>
+<script>
+requireAdmin();
+document.write(renderAdminSidebar('dashboard'));
+</script>
+<div class="main">
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Dashboard 👋</h1>
+      <p id="greeting">Welcome back, <strong id="adminName"></strong> &nbsp;·&nbsp; <span id="clock"></span></p>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(34,197,94,0.15)">👥</div></div><h2 id="s1" class="spin" style="color:#22c55e">--</h2><p>Total Residents</p></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(245,158,11,0.15)">🚪</div></div><h2 id="s2" style="color:#f59e0b">--</h2><p>Today's Visitors</p></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(239,68,68,0.15)">⚠️</div></div><h2 id="s3" style="color:#ef4444">--</h2><p>Open Complaints</p></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(99,102,241,0.15)">💰</div></div><h2 id="s4" style="color:#818cf8">--</h2><p>Pending Bills</p></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(59,130,246,0.15)">🅿️</div></div><h2 id="s5" style="color:#60a5fa">--</h2><p>Free Parking Slots</p></div>
+    <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(249,115,22,0.15)">⏳</div></div><h2 id="s6" style="color:#fb923c">--</h2><p>Pending Visitors</p></div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-box"><h3>📊 System Overview</h3><canvas id="overviewChart" height="200"></canvas></div>
+    <div class="chart-box"><h3>🗓 Recent Activity</h3><canvas id="activityChart" height="200"></canvas></div>
+  </div>
+
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:14px;color:white;">⚡ Quick Actions</h3>
+  <div class="quick-actions">
+    <a href="visitors.html" class="qa-card"><div class="qa-icon" style="background:rgba(245,158,11,0.15)">👤</div><div><h4>Manage Visitors</h4><small>Approve / reject entries</small></div></a>
+    <a href="complaints.html" class="qa-card"><div class="qa-icon" style="background:rgba(239,68,68,0.15)">📋</div><div><h4>Complaints</h4><small>Review & resolve issues</small></div></a>
+    <a href="billing.html" class="qa-card"><div class="qa-icon" style="background:rgba(99,102,241,0.15)">🧾</div><div><h4>Billing</h4><small>Manage resident bills</small></div></a>
+    <a href="announcements.html" class="qa-card"><div class="qa-icon" style="background:rgba(34,197,94,0.15)">📢</div><div><h4>Announcements</h4><small>Post community notices</small></div></a>
+    <a href="manage-users.html" class="qa-card"><div class="qa-icon" style="background:rgba(139,92,246,0.15)">⚙️</div><div><h4>Manage Users</h4><small>Add / remove residents</small></div></a>
+    <a href="parking.html" class="qa-card"><div class="qa-icon" style="background:rgba(59,130,246,0.15)">🚗</div><div><h4>Parking</h4><small>Monitor slots</small></div></a>
+  </div>
+
+  <div class="box"><div class="box-header"><span class="box-title">📢 Latest Announcements</span><a href="announcements.html" style="color:var(--purple-light);font-size:13px;text-decoration:none;">View all →</a></div>
+  <div id="annList"><div class="empty-state"><i class="fa-solid fa-spinner spin"></i><br>Loading...</div></div></div>
+</div>
+
+<script>
+document.getElementById('adminName').textContent = user.name;
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleDateString('en-PK',{weekday:'short',month:'short',day:'numeric'})+' · '+now.toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock,1000); updateClock();
+
+async function loadDashboard(){
+  try{
+    const res=await fetch(API+'/dashboard'); const d=await res.json();
+    if(d.success){
+      document.getElementById('s1').textContent=d.totalResidents;
+      document.getElementById('s2').textContent=d.todayVisitors;
+      document.getElementById('s3').textContent=d.openComplaints;
+      document.getElementById('s4').textContent=d.pendingBills;
+      document.getElementById('s5').textContent=d.availableParking;
+      document.getElementById('s6').textContent=d.pendingVisitors;
+      renderCharts(d);
+    }
+  }catch(e){}
+}
+
+function renderCharts(d){
+  const opts={responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:12}}}}};
+  new Chart(document.getElementById('overviewChart'),{type:'doughnut',data:{
+    labels:['Residents','Open Complaints','Pending Bills','Free Parking'],
+    datasets:[{data:[d.totalResidents,d.openComplaints,d.pendingBills,d.availableParking],
+      backgroundColor:['rgba(34,197,94,0.8)','rgba(239,68,68,0.8)','rgba(99,102,241,0.8)','rgba(59,130,246,0.8)'],
+      borderWidth:0,hoverOffset:6}]
+  },options:{...opts,cutout:'65%'}});
+
+  new Chart(document.getElementById('activityChart'),{type:'bar',data:{
+    labels:['Visitors','Pending','Approved','Bills','Complaints'],
+    datasets:[{label:'Count',data:[d.totalVisitors||0,d.pendingVisitors,d.totalVisitors-d.pendingVisitors,d.pendingBills,d.openComplaints],
+      backgroundColor:'rgba(99,102,241,0.7)',borderRadius:8,borderSkipped:false}]
+  },options:{...opts,scales:{x:{ticks:{color:'#64748b'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.05)'}}},plugins:{legend:{display:false}}}});
+}
+
+async function loadAnnouncements(){
+  try{
+    const res=await fetch(API+'/announcements'); const arr=await res.json();
+    const colors={Info:'#60a5fa',Warning:'#f59e0b',Event:'#22c55e',Urgent:'#ef4444'};
+    const list=document.getElementById('annList');
+    if(!arr.length){list.innerHTML='<div class="empty-state"><i class="fa fa-bullhorn"></i><br>No announcements yet.</div>';return;}
+    list.innerHTML=arr.slice(0,4).map(a=>`
+      <div class="announce-item">
+        <div class="ann-dot" style="background:${colors[a.type]||'#60a5fa'}"></div>
+        <div><div class="ann-title">${a.title} <span class="badge" style="background:rgba(99,102,241,0.15);color:#818cf8;font-size:10px;">${a.type}</span></div>
+        <div class="ann-msg">${a.message.substring(0,100)}...</div>
+        <div class="ann-time">${new Date(a.created_at).toLocaleDateString()}</div></div>
+      </div>`).join('');
+  }catch(e){}
+}
+loadDashboard(); loadAnnouncements();
+</script>
+</body></html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCMS Parking</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="js/config.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="sidebar.js"></script>
+</head><body>
+<script>document.write(sharedCSS);</script>
+<style>
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;}
+.slot-card{border-radius:16px;padding:20px;border:1px solid;transition:0.3s;position:relative;overflow:hidden;}
+.slot-card:hover{transform:translateY(-4px);}
+.slot-card.available{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.25);}
+.slot-card.occupied{background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25);}
+.slot-card.reserved{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.25);}
+.slot-num{font-size:22px;font-weight:800;margin-bottom:12px;}
+.slot-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:12px;}
+.slot-info{font-size:12px;color:var(--muted);margin-bottom:2px;}
+.slot-val{font-size:14px;font-weight:600;margin-bottom:8px;}
+.free-btn{width:100%;padding:8px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;cursor:pointer;font-size:12px;font-weight:600;transition:0.2s;margin-top:8px;}
+.free-btn:hover{background:#ef4444;color:white;}
+</style>
+<script>requireAdmin(); document.write(renderAdminSidebar('parking'));</script>
+<div class="main">
+  <div class="page-header"><div class="page-title"><h1>Parking Management</h1><p>Monitor all parking slots in real time</p></div>
+    <button class="btn btn-primary" onclick="loadParking()"><i class="fa fa-rotate"></i> Refresh</button>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat-card"><h2 id="p1" style="color:#22c55e">--</h2><p>Available</p></div>
+    <div class="stat-card"><h2 id="p2" style="color:#ef4444">--</h2><p>Occupied</p></div>
+    <div class="stat-card"><h2 id="p3" style="color:#f59e0b">--</h2><p>Reserved</p></div>
+  </div>
+  <div class="box"><div class="box-header"><span class="box-title">All Parking Slots</span></div>
+  <div class="slots-grid" id="slotsGrid"><div class="empty-state"><i class="fa fa-spinner spin"></i><br>Loading...</div></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+async function loadParking(){
+  try{
+    const res=await fetch(API+'/parking'); const slots=await res.json();
+    document.getElementById('p1').textContent=slots.filter(s=>s.status==='Available').length;
+    document.getElementById('p2').textContent=slots.filter(s=>s.status==='Occupied').length;
+    document.getElementById('p3').textContent=slots.filter(s=>s.status==='Reserved').length;
+    const bc={Available:'badge-green',Occupied:'badge-red',Reserved:'badge-yellow'};
+    const grid=document.getElementById('slotsGrid');
+    grid.innerHTML=slots.map(s=>`
+      <div class="slot-card ${s.status.toLowerCase()}">
+        <div class="slot-num">🅿 ${s.slot_number}</div>
+        <span class="slot-badge ${bc[s.status]}">${s.status}</span>
+        <div class="slot-info">Resident</div><div class="slot-val">${s.resident_name||'—'}</div>
+        <div class="slot-info">Vehicle</div><div class="slot-val">${s.vehicle_number||'—'}</div>
+        ${s.status==='Occupied'?`<button class="free-btn" onclick="freeSlot(${s.id})"><i class="fa fa-unlock"></i> Free This Slot</button>`:''}
+      </div>`).join('');
+  }catch(e){document.getElementById('slotsGrid').innerHTML='<div class="empty-state">Failed to load.</div>';}
+}
+async function freeSlot(id){
+  if(!confirm('Free this slot?'))return;
+  try{await fetch(API+'/parking',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status:'Available',vehicle_number:'',resident_id:0})});
+    const t=document.getElementById('toast');t.className='toast toast-success show';t.innerHTML='✓ Slot freed!';setTimeout(()=>t.classList.remove('show'),3000);
+    loadParking();
+  }catch(e){}
+}
+loadParking();
+</script>
+</body></html>

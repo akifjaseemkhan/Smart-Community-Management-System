@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Parking Monitor | SCMS Guard</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    min-height:100vh;
+    display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    height:100vh;
+    position:fixed;
+    top:0;
+    left:0;
+    background:#111827;
+    padding:25px 18px;
+    border-right:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:34px;
+    color:#818cf8;
+    margin-right:10px;
+}
+
+.logo span{
+    font-size:24px;
+    font-weight:700;
+}
+
+.nav-links{
+    list-style:none;
+}
+
+.nav-links li{
+    margin-bottom:12px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#cbd5e1;
+    display:flex;
+    align-items:center;
+    padding:14px 16px;
+    border-radius:14px;
+    transition:0.3s;
+}
+
+.nav-links a i{
+    font-size:22px;
+    margin-right:12px;
+}
+
+.nav-links a:hover,
+.nav-links a.active{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:white;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:260px;
+    width:calc(100% - 260px);
+    padding:35px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.search-box{
+    width:320px;
+    background:#1e293b;
+    border-radius:14px;
+    padding:12px 15px;
+    display:flex;
+    align-items:center;
+}
+
+.search-box i{
+    color:#818cf8;
+    font-size:18px;
+}
+
+.search-box input{
+    width:100%;
+    margin-left:10px;
+    background:none;
+    border:none;
+    outline:none;
+    color:white;
+}
+
+.top-icons{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.top-icons i{
+    font-size:24px;
+    color:#cbd5e1;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.top-icons i:hover{
+    color:#818cf8;
+}
+
+#clock{
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+/* PAGE TITLE */
+
+.page-title{
+    margin-bottom:30px;
+}
+
+.page-title h1{
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.page-title p{
+    color:#94a3b8;
+}
+
+/* CARDS */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+    margin-bottom:35px;
+}
+
+.card{
+    background:#1e293b;
+    padding:30px;
+    border-radius:24px;
+    text-align:center;
+    transition:0.3s;
+    box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+.card:hover{
+    transform:translateY(-6px);
+}
+
+.card i{
+    font-size:42px;
+    color:#818cf8;
+    margin-bottom:15px;
+}
+
+.card h1{
+    font-size:42px;
+    margin-bottom:8px;
+}
+
+.card p{
+    color:#94a3b8;
+}
+
+/* TABLE */
+
+.table-box{
+    background:#1e293b;
+    padding:30px;
+    border-radius:24px;
+    margin-bottom:30px;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:14px;
+    color:#94a3b8;
+    font-size:13px;
+    text-transform:uppercase;
+}
+
+td{
+    padding:16px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.status{
+    padding:7px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.active{
+    background:#10b98133;
+    color:#10b981;
+}
+
+.pending{
+    background:#f59e0b33;
+    color:#f59e0b;
+}
+
+/* ACTIVITY */
+
+.activity-box{
+    background:#1e293b;
+    padding:30px;
+    border-radius:24px;
+}
+
+.activity-item{
+    background:#0f172a;
+    padding:18px;
+    border-radius:16px;
+    margin-bottom:16px;
+    border-left:4px solid #6366f1;
+}
+
+.activity-item h4{
+    margin-bottom:5px;
+}
+
+.activity-item p{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:950px){
+
+    .sidebar{
+        width:90px;
+    }
+
+    .logo span,
+    .nav-links span{
+        display:none;
+    }
+
+    .nav-links a{
+        justify-content:center;
+    }
+
+    .nav-links a i{
+        margin:0;
+    }
+
+    .main{
+        margin-left:90px;
+        width:calc(100% - 90px);
+    }
+
+}
+
+@media(max-width:600px){
+
+    .search-box{
+        width:100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">
+
+        <i class='bx bx-shield-quarter'></i>
+
+        <span>SCMS Guard</span>
+
+    </div>
+
+    <ul class="nav-links">
+
+        <li>
+            <a href="guard.html">
+                <i class='bx bx-grid-alt'></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="add-visitor.html">
+                <i class='bx bx-user-plus'></i>
+                <span>Add Visitor</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="visitor-records.html">
+                <i class='bx bx-list-ul'></i>
+                <span>Visitor Records</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="qr-verification.html">
+                <i class='bx bx-qr-scan'></i>
+                <span>QR Verification</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="parking-monitor.html" class="active">
+                <i class='bx bx-car'></i>
+                <span>Parking Monitor</span>
+            </a>
+        </li>
+
+        <li style="margin-top:20px;">
+            <a href="index.html" style="color:#ef4444;">
+                <i class='bx bx-log-out'></i>
+                <span>Logout</span>
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class='bx bx-search'></i>
+
+            <input type="text" placeholder="Search vehicle...">
+
+        </div>
+
+        <div class="top-icons">
+
+            <div id="clock"></div>
+
+            <i class='bx bx-bell'></i>
+
+            <i class='bx bx-shield'></i>
+
+        </div>
+
+    </div>
+
+    <!-- PAGE TITLE -->
+
+    <div class="page-title">
+
+        <h1>Parking Monitoring</h1>
+
+        <p>
+            Monitor visitor vehicles, parking slots, and entry activities
+        </p>
+
+    </div>
+
+    <!-- CARDS -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <i class='bx bx-car'></i>
+
+            <h1>18</h1>
+
+            <p>Visitor Vehicles</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-parking'></i>
+
+            <h1>40</h1>
+
+            <p>Available Slots</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-lock-alt'></i>
+
+            <h1>6</h1>
+
+            <p>Reserved Slots</p>
+
+        </div>
+
+        <div class="card">
+
+            <i class='bx bx-check-circle'></i>
+
+            <h1>12</h1>
+
+            <p>Occupied Slots</p>
+
+        </div>
+
+    </div>
+
+    <!-- VEHICLE TABLE -->
+
+    <div class="table-box">
+
+        <h2 style="margin-bottom:25px;">
+            Recent Parking Entries
+        </h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Vehicle No</th>
+                    <th>Owner</th>
+                    <th>Parking Slot</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>LEA-4587</td>
+                    <td>Ali Raza</td>
+                    <td>P-12</td>
+                    <td>
+                        <span class="status active">
+                            Parked
+                        </span>
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>ICT-9921</td>
+                    <td>Ahmed Khan</td>
+                    <td>P-08</td>
+                    <td>
+                        <span class="status pending">
+                            Leaving
+                        </span>
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>LHR-7812</td>
+                    <td>Usman Tariq</td>
+                    <td>P-15</td>
+                    <td>
+                        <span class="status active">
+                            Parked
+                        </span>
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- ACTIVITY -->
+
+    <div class="activity-box">
+
+        <h2 style="margin-bottom:25px;">
+            Parking Activity
+        </h2>
+
+        <div class="activity-item">
+
+            <h4>Vehicle Entered</h4>
+
+            <p>
+                LEA-4587 entered parking at Gate 2 • 2:10 PM
+            </p>
+
+        </div>
+
+        <div class="activity-item">
+
+            <h4>Parking Slot Reserved</h4>
+
+            <p>
+                Slot P-08 reserved for visitor delivery • 1:40 PM
+            </p>
+
+        </div>
+
+        <div class="activity-item">
+
+            <h4>Vehicle Exited</h4>
+
+            <p>
+                ICT-9921 exited from main parking • 12:55 PM
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+    now.toLocaleDateString() + " | " +
+    now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+</html>
