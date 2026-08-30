@@ -8,6 +8,39 @@ function requireGuard(){ if(!user.id||user.role!=='Guard') window.location.href=
 
 function logout(){ if(confirm('Are you sure you want to logout?')){ localStorage.removeItem('scms_user'); window.location.href='index.html'; } }
 
+/* ---- Demo-only role switcher ----------------------------------------------
+   Lets a visitor jump between the Admin / Resident / Guard views (and perform
+   that role's actions) without logging out. Ids/names match the seed data in
+   database/scms_database.sql and js/mock-api.js. */
+const DEMO_USERS = {
+  Admin:    { id:1, name:'Admin User',   role:'Admin',    apartment:'' },
+  Resident: { id:2, name:'Ali Raza',     role:'Resident', apartment:'A-203' },
+  Guard:    { id:4, name:'Guard Hassan', role:'Guard',    apartment:'' }
+};
+function switchRole(role){
+  const u = DEMO_USERS[role];
+  if(!u) return;
+  localStorage.setItem('scms_user', JSON.stringify(u));
+  window.location.href = role==='Admin' ? 'admin.html'
+                       : role==='Resident' ? 'resident.html'
+                       : 'guard.html';
+}
+function renderRoleSwitcher(current){
+  const cur = String(current||'').toLowerCase();
+  const items = [
+    {key:'Admin',    icon:'fa-user-shield',   label:'Admin'},
+    {key:'Resident', icon:'fa-house-user',    label:'Resident'},
+    {key:'Guard',    icon:'fa-shield-halved', label:'Guard'}
+  ];
+  return `<div class="role-switch">
+    <div class="rs-label"><i class="fa-solid fa-shuffle"></i> Demo · switch view</div>
+    <div class="rs-btns">
+      ${items.map(it=>`<button class="rs-btn${it.key.toLowerCase()===cur?' active':''}" ${it.key.toLowerCase()===cur?'disabled':''} onclick="switchRole('${it.key}')">
+        <i class="fa-solid ${it.icon}"></i><span>${it.label}</span></button>`).join('')}
+    </div>
+  </div>`;
+}
+
 function renderAdminSidebar(activePage){
   const navItems = [
     {href:'admin.html',icon:'fa-grid-2',label:'Dashboard',id:'dashboard'},
@@ -32,6 +65,7 @@ function renderAdminSidebar(activePage){
         <div class="avatar">${(user.name||'A')[0].toUpperCase()}</div>
         <div><p class="u-name">${user.name||'Admin'}</p><small>Administrator</small></div>
       </div>
+      ${renderRoleSwitcher('Admin')}
       <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
   </aside>`;
@@ -143,4 +177,11 @@ tr:hover td{background:var(--surface2);}
 .filter-tab.active,.filter-tab:hover{background:var(--purple);color:white;border-color:var(--purple);}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin 1s linear infinite;display:inline-block;}
+.role-switch{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+.rs-label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.rs-btns{display:flex;gap:6px;}
+.rs-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:0.2s;}
+.rs-btn i{font-size:14px;}
+.rs-btn:hover:not(:disabled){color:var(--text);border-color:var(--purple);background:rgba(99,102,241,0.12);}
+.rs-btn.active{background:linear-gradient(135deg,rgba(99,102,241,0.28),rgba(139,92,246,0.16));color:var(--purple-light);border-color:rgba(99,102,241,0.45);cursor:default;}
 </style>`;

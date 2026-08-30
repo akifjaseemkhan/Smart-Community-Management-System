@@ -40,7 +40,10 @@
       <a href="#" onclick="switchTab('notices',this)">📢 Notices</a>
     </nav>
   </div>
-  <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  <div>
+    <script>document.write(renderRoleSwitcher('Resident'));</script>
+    <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </div>
 </aside>
 
 <div class="main">
